@@ -28,7 +28,7 @@ O JWT é composto por três partes:
 <hr>
 
 ### Implementando JWT no Laravel
-**Requisitos:**
+**Pré-Requisitos:**
 - PHP 8.3
 - Composer
 
@@ -167,8 +167,7 @@ O JWT é composto por três partes:
 <hr>
 
 ### Instalação
-Requisitos:
-
+**Pré-Requisitos:**
 - PHP 8.3
 - Composer
 - Docker
