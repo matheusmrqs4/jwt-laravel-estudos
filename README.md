@@ -16,10 +16,12 @@ O JWT é composto por três partes:
 
 <hr>
 
-**Resultado:**
+**Resultado:** <br>
     O resultado final é um token com três seções (header, payload, signature) separadas por “.” 
 
-**Usando o Token:**
+<br>
+
+**Usando o Token:** <br>
     Ao fazer login em um serviço de autenticação um token JWT é criado e retornado para o client. Esse token deve ser enviado para as APIs através do header Authorization de cada requisição HTTP com a flag Bearer.
     Assim, a API não precisa ir até o banco de dados consultar as informações do usuário, pois contido no próprio token JWT já temos suas credenciais de acesso.
 
