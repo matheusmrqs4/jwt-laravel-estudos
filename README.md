@@ -96,7 +96,7 @@ O JWT é composto por três partes:
         Route::get('me', [AuthController::class, 'me']);
     });
     ```
-    Assim, as rotas logout, me e refresh estão protegidas, onde apenas usuários autenticados podem acessá-las.
+    Assim, as rotas logout e me estão protegidas, onde, apenas usuários autenticados podem acessá-las.
 
 <br>
 <br>
