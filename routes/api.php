@@ -1,6 +1,5 @@
 <?php
 
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\Auth\AuthController;
 use App\Http\Controllers\API\Auth\RegisterController;
@@ -20,6 +19,6 @@ Route::post('register', [RegisterController::class, 'register']);
 Route::post('login', [AuthController::class, 'login']);
 Route::middleware('auth:api')->prefix('auth')->group(function () {
     Route::post('logout', [AuthController::class, 'logout']);
-    Route::post('me', [AuthController::class, 'me']);
+    Route::get('me', [AuthController::class, 'me']);
     Route::post('refresh', [AuthController::class, 'refresh']);
 });

@@ -1,66 +1,204 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Estudos sobre JWT
+JWT (Json Web Token) É uma forma de transmitir informações entre partes de forma segura e compacta em um formato JSON.
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Funciona como um cartão de identificação online, muitos sistemas usam JWTs para autenticar usuários e permitir acesso a recursos protegidos na web de maneira segura e eficiente.
 
-## About Laravel
+O JWT é composto por três partes:
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- **Header**
+    Consiste em duas partes: o tipo do token (que é JWT) e o algoritmo de assinatura (HMAC SHA256 ou RSA).
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+- **Payload**
+    O Payload é um objeto JSON com as Claims (informações) da entidade tratada, normalmente o usuário autenticado.
+    
+- **Signature**
+    A assinatura é a concatenação dos hashes gerados a partir do Header e Payload usando base64UrlEncode, com uma chave secreta ou certificado RSA. Essa assinatura é utilizada para garantir a integridade do token.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+<hr>
 
-## Learning Laravel
+**Resultado:**
+    O resultado final é um token com três seções (header, payload, signature) separadas por “.” 
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+**Usando o Token:**
+    Ao fazer login em um serviço de autenticação um token JWT é criado e retornado para o client. Esse token deve ser enviado para as APIs através do header Authorization de cada requisição HTTP com a flag Bearer.
+    Assim, a API não precisa ir até o banco de dados consultar as informações do usuário, pois contido no próprio token JWT já temos suas credenciais de acesso.
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+<hr>
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 2000 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### Implementando JWT no Laravel
+**Requisitos:**
+- PHP 8.3
+- Composer
 
-## Laravel Sponsors
+1. Instale a biblioteca JWT:
+    ```
+    composer require tymon/jwt-auth
+    ```
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell).
+2. Configure o pacote JWT:
+    ```
+    php artisan vendor:publish --provider="Tymon\JWTAuth\Providers\LaravelServiceProvider"
+    ```
 
-### Premium Partners
+3. Crie o controller de Autenticação:
+    ```
+    php artisan make:contoller AuthController
+    ```
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Cubet Techno Labs](https://cubettech.com)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[Many](https://www.many.co.uk)**
-- **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
-- **[DevSquad](https://devsquad.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[OP.GG](https://op.gg)**
-- **[WebReinvent](https://webreinvent.com/?utm_source=laravel&utm_medium=github&utm_campaign=patreon-sponsors)**
-- **[Lendio](https://lendio.com)**
+4. Implemente a Autenticação:
+    ```
+        public function register(Request $request, User $user)
+        {   
+            $userData = $request->only('name', 'email', 'password');
+            $userData['password'] = bcrypt($userData['password']);
 
-## Contributing
+            if (!$user = $user->create($userData)) {
+                abort(500, "Error to create new user");
+            }
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+            $token = JWTAuth::attempt(['email' => $userData['email'], 'password' => $request->password]);
 
-## Code of Conduct
+            return response()->json([
+            'data' => [
+                'msg' => 'Successfully',
+                'user' => $user,
+                'token' => $token,
+            ]
+            ], 200);
+        }
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+        public function login(Request $request)
+        {
+            $credentials = $request->only('email', 'password');
 
-## Security Vulnerabilities
+            if (!$token = auth('api')->attempt($credentials)) {
+                abort(403, "Invalid Login");
+            }
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+            return response()
+                    ->json([
+                    'data' => [
+                            'msg' => 'Login Successful',
+                            'token' => $token
+                    ]
+                    ]);
+        }
+    ```
 
-## License
+5. Proteja suas Rotas usando o middleware auth:api:
+    ```
+    Route::middleware('auth:api')->prefix('auth')->group(function () {
+        Route::post('logout', [AuthController::class, 'logout']);
+        Route::get('me', [AuthController::class, 'me']);
+    });
+    ```
+    Assim, as rotas logout, me e refresh estão protegidas, onde apenas usuários autenticados podem acessá-las.
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+<hr>
+
+**Conclusão:**
+    A implementação de autenticação JWT em uma API REST Laravel é uma maneira segura e eficaz de proteger seus recursos e garantir que apenas usuários autorizados tenham acesso a eles.
+
+<hr>
+
+### Endpoints
+
+#### Autenticação
+- Criar conta: ``` POST api/register ```
+    Retorna:
+    ```
+            {
+                "data": {
+                    "msg": "Successfully",
+                    "user": {
+                        "name": "John Doe",
+                        "email": "johndoe@email.com",
+                        "updated_at": "2024-03-25T21:06:25.000000Z",
+                        "created_at": "2024-03-25T21:06:25.000000Z",
+                        "id": 2
+                    },
+                "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0Ojg4ODgvYXBpL3JlZ2lzdGVyIiwiaWF0IjoxNzExNDAwNzg1LCJleHAiOjE3MTE0MDQzODUsIm5iZiI6MTcxMTQwMDc4NSwianRpIjoidzdZdlBrdlNMNnozYVBGYyIsInN1YiI6IjIiLCJwcnYiOiIyM2JkNWM4OTQ5ZjYwMGFkYjM5ZTcwMWM0MDA4NzJkYjdhNTk3NmY3In0.HYrmy1-D0SIxrVlcfbC7R_bskDtRi5yWTrClXhonyow"
+            }
+        }
+    ```
+
+- Login: ``` POST api/login ```
+    Retorna:
+    ```
+    {
+        "data": {
+            "msg": "Login Successful",
+            "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0Ojg4ODgvYXBpL2xvZ2luIiwiaWF0IjoxNzExNDAwOTA0LCJleHAiOjE3MTE0MDQ1MDQsIm5iZiI6MTcxMTQwMDkwNCwianRpIjoiaHJNc0Uzbk5SQXlGNlprRCIsInN1YiI6IjIiLCJwcnYiOiIyM2JkNWM4OTQ5ZjYwMGFkYjM5ZTcwMWM0MDA4NzJkYjdhNTk3NmY3In0.ZqcalR7N_vxTRDr5pZi-ECJlGwRZTNHVteqEH-tm-TA"
+        }
+    }
+    ```
+
+- Logout: ``` POST api/auth/logout ```
+    Retorna:
+    ```
+    {
+        "message": "Logout Successful"
+    }
+    ```
+
+- Recuperar informações do usuário autenticado: ``` GET api/auth/me ```
+    Retorna:
+    ```
+    {
+        "id": 2,
+        "name": "John Doe",
+        "email": "johndoe@email.com",
+        "email_verified_at": null,
+        "remember_token": null,
+        "created_at": "2024-03-25T21:06:25.000000Z",
+        "updated_at": "2024-03-25T21:06:25.000000Z"
+    }
+    ```
+
+<hr>
+
+### Instalação
+1. Clone o repositório:
+    ```
+    git clone 
+    ```
+
+2. Entre no diretório:
+    ```
+    cd your-repo
+    ```
+
+3. Instale as dependências:
+    ```
+    composer install
+    ```
+
+4. Crie um arquivo .env e preencha os dados:
+    ```
+    cp .env.example .env**
+    ```
+
+5. Gere uma nova chave da aplicação:
+    ```
+    php artisan key:generate
+    ```
+
+6. Gere uma nova chave JWT:
+    ```
+    php artisan jwt:secret
+    ```
+
+7. Rode os Containers Docker:
+    ```
+    docker-compose up -d --build
+    ```
+
+8. Acesse em:
+    ```
+    http://127.0.0.1:8888/
+    ```
+
+<hr>
+
+### Testes
+![jwt-tests](public/jwt-tests.png)
