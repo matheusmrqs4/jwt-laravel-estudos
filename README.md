@@ -30,6 +30,8 @@ O JWT é composto por três partes:
 - PHP 8.3
 - Composer
 
+<br>
+
 1. Instale a biblioteca JWT:
     ```
     composer require tymon/jwt-auth
@@ -63,7 +65,7 @@ O JWT é composto por três partes:
                 'msg' => 'Successfully',
                 'user' => $user,
                 'token' => $token,
-            ]
+                ]
             ], 200);
         }
 
@@ -80,7 +82,7 @@ O JWT é composto por três partes:
                     'data' => [
                             'msg' => 'Login Successful',
                             'token' => $token
-                    ]
+                        ]
                     ]);
         }
     ```
@@ -94,9 +96,10 @@ O JWT é composto por três partes:
     ```
     Assim, as rotas logout, me e refresh estão protegidas, onde apenas usuários autenticados podem acessá-las.
 
-<hr>
+<br>
+<br>
 
-**Conclusão:**
+**Conclusão:** <br>
     A implementação de autenticação JWT em uma API REST Laravel é uma maneira segura e eficaz de proteger seus recursos e garantir que apenas usuários autorizados tenham acesso a eles.
 
 <hr>
@@ -105,6 +108,7 @@ O JWT é composto por três partes:
 
 #### Autenticação
 - Criar conta: ``` POST api/register ```
+
     Retorna:
     ```
             {
@@ -123,6 +127,7 @@ O JWT é composto por três partes:
     ```
 
 - Login: ``` POST api/login ```
+  
     Retorna:
     ```
     {
@@ -134,6 +139,7 @@ O JWT é composto por três partes:
     ```
 
 - Logout: ``` POST api/auth/logout ```
+  
     Retorna:
     ```
     {
@@ -142,6 +148,7 @@ O JWT é composto por três partes:
     ```
 
 - Recuperar informações do usuário autenticado: ``` GET api/auth/me ```
+  
     Retorna:
     ```
     {
@@ -158,9 +165,17 @@ O JWT é composto por três partes:
 <hr>
 
 ### Instalação
+Requisitos:
+
+- PHP 8.3
+- Composer
+- Docker
+
+<br>
+
 1. Clone o repositório:
     ```
-    git clone 
+    git clone https://github.com/matheusmrqs4/jwt-laravel-study
     ```
 
 2. Entre no diretório:
@@ -175,7 +190,7 @@ O JWT é composto por três partes:
 
 4. Crie um arquivo .env e preencha os dados:
     ```
-    cp .env.example .env**
+    cp .env.example .env
     ```
 
 5. Gere uma nova chave da aplicação:
@@ -200,5 +215,5 @@ O JWT é composto por três partes:
 
 <hr>
 
-### Testes
+### Testes com PHPUnit
 ![jwt-tests](public/jwt-tests.png)
