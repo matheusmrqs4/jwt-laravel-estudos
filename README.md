@@ -69,7 +69,7 @@ O JWT é composto por três partes:
                                 'user' => $user,
                                 'token' => $token,
                             ]
-            ], 200);
+                        ], 200);
         }
 
         public function login(Request $request)
@@ -85,9 +85,10 @@ O JWT é composto por três partes:
                             'data' => [
                                     'msg' => 'Login Successful',
                                     'token' => $token
-                                ]
+                            ]
                         ], 200);
         }
+    
     ```
 
 5. Proteja suas Rotas usando o middleware auth:api:
