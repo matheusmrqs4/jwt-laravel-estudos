@@ -62,12 +62,13 @@ O JWT é composto por três partes:
 
             $token = JWTAuth::attempt(['email' => $userData['email'], 'password' => $request->password]);
 
-            return response()->json([
-            'data' => [
-                'msg' => 'Successfully',
-                'user' => $user,
-                'token' => $token,
-                ]
+            return response()
+                        ->json([
+                            'data' => [
+                                'msg' => 'Successfully',
+                                'user' => $user,
+                                'token' => $token,
+                            ]
             ], 200);
         }
 
@@ -80,12 +81,12 @@ O JWT é composto por três partes:
             }
 
             return response()
-                    ->json([
-                    'data' => [
-                            'msg' => 'Login Successful',
-                            'token' => $token
-                        ]
-                    ]);
+                        ->json([
+                            'data' => [
+                                    'msg' => 'Login Successful',
+                                    'token' => $token
+                                ]
+                        ], 200);
         }
     ```
 
